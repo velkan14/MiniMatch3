@@ -10,8 +10,9 @@ public:
     virtual ~Board();
     void init();
     bool input(SDL_Event* e);
-    void process();
-    void render(SDL_Renderer* renderer);
+    void process(float delta_time);
+    void render();
+
 protected:
 
 private:
@@ -41,9 +42,12 @@ private:
     Gem* board[LINES][COLLUMNS];
     Gem* selected_gem = NULL;
     Gem* selected_gem_2 = NULL;
+    Gem* swaped_gem_1 = NULL;
+    Gem* swaped_gem_2 = NULL;
     GemEmpty* null_gem = NULL;
     void swap_gem(Gem* g1, Gem* g2);
     bool check_matchs();
+    Gem* generate_gem(int i, int j);
     bool is_placing = false;
     bool matches = false;
 };

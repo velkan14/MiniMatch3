@@ -7,8 +7,8 @@ public:
     GemEmpty(): Gem(){}
     virtual ~GemEmpty() {}
     virtual bool input(SDL_Event* e) override { return false; }
-    virtual void process() override {}
-    virtual void render(SDL_Renderer* gRenderer) override {}
+    virtual void process(float delta_time) override {}
+    virtual void render() override {}
 protected:
 
 private:

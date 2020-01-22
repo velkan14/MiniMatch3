@@ -4,15 +4,17 @@
 
 Gem::Gem()
 {
-    //ctor
 }
 
 bool Gem::input(SDL_Event* e) {
     if (is_moving && e->type == SDL_MOUSEMOTION) {
         int x, y;
         SDL_GetMouseState(&x, &y);
-        if (true) {
-            target_pos = vec2(x - 35, y - 35);
+        if (pos.x - 70 < x && x < pos.x + 70 * 2 && pos.y - 70 < y && y < pos.y + 70 * 2) {
+            target_pos = vec2(x - 35.0, y - 35.0);
+        }
+        else {
+            is_moving = false;
         }
         if (pos.x < x && x < pos.x + 70 && pos.y < y && y < pos.y + 70) return true;
     }
@@ -32,33 +34,32 @@ bool Gem::input(SDL_Event* e) {
     return false;
 }
 
-void Gem::process() {
+void Gem::process(float delta_time) {
     float const margin_x = 232.0;
     float const margin_y = 104.0;
-    if(!is_moving) target_pos = vec2(float(margin_x + i * 70.0), float(margin_y + j * 70));
+    if(!is_moving) target_pos = vec2(margin_x + i * 70.0, margin_y + j * 70);
     vec2 direction = target_pos - pos;
-    vec2 normalized = direction.normalize();
-    //std::cout << direction.norm() << std::endl;
-    pos = pos + normalized * speed;
-
-    if ( direction.norm() < 11.0) {
+    if ( direction.norm() < 4.0) {
+        //std::cout << direction.norm() << std::endl;
+        pos = vec2(margin_x + i * 70.0, margin_y + j * 70);
         is_placing = false;
     }
     else {
         is_placing = true;
+        vec2 normalized = direction.normalize();
+        pos = pos + (normalized * speed * delta_time);
     }
 }
 
-void Gem::render(SDL_Renderer* gRenderer) {
+void Gem::render() {
     texture->render(pos.x, pos.y);
 }
 
-void Gem::setTexture(Texture* tex) {
+void Gem::set_texture(Texture* tex) {
     texture = tex;
 }
 
-void Gem::setPosition(float x, float y) {
-    //pos = vec2(x, y);
+void Gem::set_position(float x, float y) {
     target_pos = vec2(x, y);
 }
 
@@ -73,4 +74,12 @@ bool Gem::is_neighbor(Gem* g)
         if (i - 1 == g->i) return true;
     }
     return false;
+}
+
+void Gem::set_type(int t) {
+    type = t;
+}
+
+int Gem::get_type() const {
+    return type;
 }

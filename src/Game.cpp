@@ -55,12 +55,6 @@ bool Game::init(int pos_x, int pos_y, int screen_width, int screen_height)
         }
     }
 
-    /*text = new BTexture();
-    if (!text->loadFromFile("assets//gems/Color-1.png")) {
-        std::cout << "Failed to load image foo.png" << std::endl;
-        success = false;
-    }
-    */
     board = new Board();
     board->init();
 
@@ -83,13 +77,20 @@ void Game::input()
 void Game::process()
 {
     tick++;
-    board->process();
+    
+    delta_time =  (SDL_GetTicks() - last_frame_ticks) / 1000.f;
+
+    //std::cout << tick << " : " << SDL_GetTicks() << ": " << delta_time << std::endl;
+
+    board->process(delta_time);
+
+    last_frame_ticks = SDL_GetTicks();
 }
 
 void Game::render()
 {
     SDL_RenderClear(renderer);
-    board->render(renderer);
+    board->render();
     SDL_RenderPresent(renderer);
 }
 

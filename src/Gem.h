@@ -8,22 +8,25 @@ public:
     Gem();
     virtual ~Gem() {}
     virtual bool input(SDL_Event* e);
-    virtual void process();
-    virtual void render(SDL_Renderer* gRenderer);
-    void setTexture(Texture* tex);
-    void setPosition(float x, float y);
+    virtual void process(float delta_time);
+    virtual void render();
+    void set_texture(Texture* tex);
+    void set_position(float x, float y);
+    void set_type(int type);
+    int get_type() const;
+    bool is_neighbor(Gem* g);
+
     bool is_moving = false;
     bool is_placing = true;
-    bool is_neighbor(Gem* g);
-    int type = 0;
-    int i, j;
+    int i = 0, j = 0;
     vec2 pos;
     int match = 0;
 protected:
 
 private:
-    float speed = 2.0;
+    int type = 0;
+    float speed = 500.0;
     vec2 target_pos;
-    Texture* texture;
+    Texture* texture = NULL;
 
 };

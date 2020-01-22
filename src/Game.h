@@ -2,7 +2,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "Board.h"
-#include "Texture.h".
 
 class Game
 {
@@ -23,12 +22,12 @@ protected:
 private:
     SDL_Window* window;
     SDL_Surface* surface;
-    SDL_Event* event;
 
-    Texture* text;
     Board* board;
     bool isRunning = false;
     int tick = 0;
+    float delta_time = 0.0;
+    unsigned int last_frame_ticks = 0;
 
 };
 
