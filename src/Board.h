@@ -13,6 +13,9 @@ public:
     void process(float delta_time);
     void render();
 
+    void swap_gem(Gem* g1, int i, int j);
+    void select_gem(Gem* gem);
+
 protected:
 
 private:
@@ -41,14 +44,17 @@ private:
     } board[LINES][COLLUMNS];*/
     Gem* board[LINES][COLLUMNS];
     Gem* selected_gem = NULL;
-    Gem* selected_gem_2 = NULL;
+    Gem* last_swaped[2] = { NULL, NULL };
     Gem* swaped_gem_1 = NULL;
     Gem* swaped_gem_2 = NULL;
     GemEmpty* null_gem = NULL;
     void swap_gem(Gem* g1, Gem* g2);
     bool check_matchs();
     Gem* generate_gem(int i, int j);
+    void print_board();
+    void destroy_matches();
     bool is_placing = false;
+    bool check = false;
     bool matches = false;
 };
 

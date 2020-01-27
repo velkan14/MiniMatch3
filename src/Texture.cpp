@@ -43,10 +43,22 @@ void Texture::free()
 }
 
 //Renders texture at given point
-void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Rect* dest_rect, SDL_Point* center, SDL_RendererFlip flip)
 {
-    SDL_Rect dest_rect = { x, y, tWidth, tHeight };
-    SDL_RenderCopy(Game::renderer, tTexture, NULL, &dest_rect);
+    if (dest_rect == NULL) {
+        SDL_Rect rect = { x, y, tWidth, tHeight };
+        if (clip != NULL)
+        {
+            rect.w = clip->w;
+            rect.h = clip->h;
+        }
+        SDL_RenderCopyEx(Game::renderer, tTexture, clip, &rect, angle, center, flip);
+    }
+    else {
+        SDL_RenderCopyEx(Game::renderer, tTexture, clip, dest_rect, angle, center, flip);
+    }
+    
+    //SDL_RenderCopy(Game::renderer, tTexture, NULL, &dest_rect);
 }
 
 

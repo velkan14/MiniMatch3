@@ -66,6 +66,7 @@ const bool operator!= (const vec2& v1, const vec2& v2)
     return !(v1 == v2);
 }
 
+ 
 float vec2::quadrance() const {
     return pow(x, 2) + pow(y, 2);
 }
@@ -103,6 +104,24 @@ std::stringstream& operator>> (std::stringstream& is, vec2& other) {
     is >> other.y;
     return is;
 }
+
+const vec2 lerp(const vec2& v0, const vec2& v1, const float k)
+{
+    return (1 - k) * v0 + k * v1;
+}
+
+const vec2 slerp(const vec2& v0, const vec2& v1, const float k)
+{
+    vec2 vn0 = v0.normalize();
+    vec2 vn1 = v1.normalize();
+
+    float angle = acos(vn0.dot(vn1));
+    float k0 = sin((1 - k) * angle) / sin(angle);
+    float k1 = sin(k * angle) / sin(angle);
+
+    return k0 * v0 + k1 * v1;
+}
+
 
 void vec2::clean() {
     if (x > -1e-5 && x < 1e-5) x = 0;

@@ -80,8 +80,6 @@ void Game::process()
     
     delta_time =  (SDL_GetTicks() - last_frame_ticks) / 1000.f;
 
-    //std::cout << tick << " : " << SDL_GetTicks() << ": " << delta_time << std::endl;
-
     board->process(delta_time);
 
     last_frame_ticks = SDL_GetTicks();

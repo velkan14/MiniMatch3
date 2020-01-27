@@ -34,6 +34,10 @@ struct vec2 {
     friend std::istream& operator>> (std::istream& is, vec2& other);
     friend std::stringstream& operator>> (std::stringstream& is, vec2& other);
 
+
+    friend const vec2 lerp(const vec2& v0, const vec2& v1, const float k);
+    friend const vec2 slerp(const vec2& v0, const vec2& v1, const float k);
+
     float quadrance() const;
     float norm() const;
     const vec2 normalize() const;
