@@ -6,6 +6,14 @@ TextureLoader::TextureLoader()
 {
 }
 
+TextureLoader::~TextureLoader() {
+    for (MapType::iterator it = textures_map.begin(); it != textures_map.end(); ++it)
+    {
+        delete it->second;
+        textures_map.erase(it);
+    }
+}
+
 void TextureLoader::init()
 {
 }

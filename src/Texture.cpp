@@ -10,7 +10,7 @@ Texture::Texture()
 
 Texture::~Texture()
 {
-
+    free();
 }
 
 bool Texture::load_from_file(std::string path)
@@ -73,7 +73,6 @@ void Texture::free()
         width = 0;
         height = 0;
     }
-
 }
 void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Rect* dest_rect, SDL_Point* center, SDL_RendererFlip flip)
 {

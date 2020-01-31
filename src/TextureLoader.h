@@ -10,7 +10,7 @@ public:
     typedef std::map<std::string, Texture*> MapType;
 
     TextureLoader();
-    virtual ~TextureLoader() {}
+    ~TextureLoader();
     void init();
 
     Texture* load_texture(std::string name);

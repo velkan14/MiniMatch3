@@ -7,7 +7,7 @@
 class Menu : public Screen {
 public:
     Menu(std::string text);
-    virtual ~Menu() {}
+    ~Menu();
     void init() override;
     bool input(SDL_Event* e) override;
     void process(float delta_time) override;

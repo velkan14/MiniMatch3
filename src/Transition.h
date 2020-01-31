@@ -7,9 +7,7 @@ class Transition
 public:
     const int SPEED = 10;
     Transition();
-    virtual ~Transition() {
-
-    }
+    ~Transition();
     void init();
     bool input(SDL_Event* e);
     void process(float delta_time);

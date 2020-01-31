@@ -13,7 +13,8 @@ Game::Game()
 
 Game::~Game()
 {
-    //dtor
+    delete current_screen;
+    delete transition;
 }
 
 bool Game::init(int pos_x, int pos_y, int screen_width, int screen_height)
@@ -158,7 +159,7 @@ Screen* Game::get_screen(int number)
     case 1:
         return new Menu("Level 1");
     case 2:
-        return new Board(new Score(5, 5, 5, 5, 5));
+        return new Board(new Score(20, 20, 20, 20, 20));
     case 3:
         return new Menu("Level 2");
     case 4:
@@ -173,4 +174,5 @@ Screen* Game::get_screen(int number)
     default:
         break;
     }
+    return new Menu("Please, close game!");
 }

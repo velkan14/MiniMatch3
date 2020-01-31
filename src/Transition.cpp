@@ -5,6 +5,8 @@ Transition::Transition()
 {
 }
 
+Transition::~Transition() {
+}
 void Transition::init()
 {
 }

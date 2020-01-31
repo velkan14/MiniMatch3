@@ -75,14 +75,20 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\vc_sdl2\SDL2_ttf-2.0.15\include;C:\vc_sdl2\SDL2-2.0.10\include;C:\vc_sdl2\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\vc_sdl2\SDL2_ttf-2.0.15\lib\x64;C:\vc_sdl2\SDL2_image-2.0.5\lib\x64;C:\vc_sdl2\SDL2-2.0.10\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>imports\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>imports\include;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>imports\include;$(IncludePath)</IncludePath>
+    <LibraryPath>imports\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -143,10 +149,11 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -8,7 +8,7 @@ class Score
 {
 public:
     Score(int black_n, int white_n, int pink_n, int blue_n, int orange_n);
-    virtual ~Score() {}
+    ~Score();
     void init();
     bool input(SDL_Event* e);
     void process(float delta_time);

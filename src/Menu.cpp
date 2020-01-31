@@ -5,6 +5,10 @@ Menu::Menu(std::string text) : Screen() {
 	text_to_write = text;
 }
 
+Menu::~Menu() {
+	TTF_CloseFont(font);
+}
+
 void Menu::init()
 {
 	text = new Texture();

@@ -17,6 +17,16 @@ Score::Score(int black_n, int white_n, int pink_n, int blue_n, int orange_n)
 	}
 }
 
+Score::~Score() {
+	TTF_CloseFont(font);
+	font = NULL;
+
+	for (int i = 0; i < TOTAL; i++) {
+		delete texts[i];
+		texts[i] = NULL;
+	}
+}
+
 void Score::init()
 {
 	gems[BLACK] = Game::texture_loader->load_texture("assets/Color-1.png");
@@ -31,7 +41,7 @@ void Score::init()
 		std::cout << "Failed to load font! Error: " << TTF_GetError() << std::endl;
 	}
 	for (int i = 0; i < TOTAL; i++) {
-		texts[i]->load_from_text(font, "x 0", text_color);
+		texts[i]->load_from_text(font, "x " + std::to_string(gems_destroyed[i]), text_color);
 	}
 
 }
@@ -74,7 +84,6 @@ void Score::add_gem_destroyed(gem_type type, int number)
 	if (gems_destroyed[type] < 0) gems_destroyed[type] = 0;
 	texts[type]->load_from_text(font, "x " + std::to_string(gems_destroyed[type]), text_color);
 	total_destroyed += number;
-
 }
 
 int Score::get_missed_swapes()

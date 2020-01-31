@@ -25,9 +25,6 @@ Board::~Board()
         }
     }
     delete null_gem ;
-    delete selected_gem ;
-    delete last_swaped[0];
-    delete last_swaped[1];
     delete score;
 }
 
