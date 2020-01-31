@@ -1,11 +1,14 @@
 #include "Game.h"
 #include <iostream>
+#include "Menu.h"
 
 SDL_Renderer* Game::renderer = NULL;
+TextureLoader* Game::texture_loader = NULL;
 
 Game::Game()
 {
-    //ctor
+    texture_loader = new TextureLoader();
+    transition = new Transition();
 }
 
 Game::~Game()
@@ -48,15 +51,22 @@ bool Game::init(int pos_x, int pos_y, int screen_width, int screen_height)
                     //Initialize renderer color
                     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                     surface = SDL_GetWindowSurface(window);
+                    if (TTF_Init() == -1)
+                    {
+                        std::cout << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << std::endl;
+                        success = false;
+                    }
                     success = true;
-                    isRunning = true;
+                    is_running = true;
                 }
             }
         }
     }
 
-    board = new Board();
-    board->init();
+    current_screen = get_screen(screen_index++);
+    current_screen->init();
+    transition->out();
+    state = Game::TRANSITION_OUT;
 
     return success;
 }
@@ -68,9 +78,9 @@ void Game::input()
     {
         if (e.type == SDL_QUIT)
         {
-            isRunning = false;
+            is_running = false;
         }
-        board->input(&e);
+        current_screen->input(&e);
     }
 }
 
@@ -80,21 +90,50 @@ void Game::process()
     
     delta_time =  (SDL_GetTicks() - last_frame_ticks) / 1000.f;
 
-    board->process(delta_time);
-
+    switch (state)
+    {
+    case Game::PLAYING:
+        current_screen->process(delta_time);
+        if (current_screen->completed()) {
+            transition->in();
+            state = Game::TRANSITION_IN;
+        }
+        break;
+    case Game::TRANSITION_IN:
+        transition->process(delta_time);
+        if (transition->completed()) {
+            Screen* next = get_screen(screen_index++);
+            delete current_screen;
+            current_screen = next;
+            current_screen->init();
+            transition->out();
+            state = Game::TRANSITION_OUT;
+        }
+        break;
+    case Game::TRANSITION_OUT:
+        transition->process(delta_time);
+        if (transition->completed()) {
+            state = Game::PLAYING;
+        }
+        break;
+    default:
+        break;
+    }
     last_frame_ticks = SDL_GetTicks();
 }
 
 void Game::render()
 {
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
-    board->render();
+    current_screen->render();
+    transition->render();
     SDL_RenderPresent(renderer);
 }
 
 bool Game::running() const
 {
-    return isRunning;
+    return is_running;
 }
 
 void Game::clean()
@@ -108,4 +147,30 @@ void Game::clean()
     //Quit SDL subsystems
     IMG_Quit();
     SDL_Quit();
+}
+
+Screen* Game::get_screen(int number)
+{
+    switch (number)
+    {
+    case 0:
+        return new Menu("Click to Start!");
+    case 1:
+        return new Menu("Level 1");
+    case 2:
+        return new Board(new Score(5, 5, 5, 5, 5));
+    case 3:
+        return new Menu("Level 2");
+    case 4:
+        return new Board(new Score(30, 30, 30, 30, 30));
+    case 5:
+        return new Menu("Level 3");
+    case 6:
+        return new Board(new Score(40, 40, 40, 40, 40));
+    case 7:
+        //
+        return new Menu("Congratulations!!");
+    default:
+        break;
+    }
 }

@@ -2,8 +2,10 @@
 #include <iostream>
 #include <memory>
 #include <array>
+#include "Constants.h"
+#include "Game.h"
 
-Board::Board()
+Board::Board(Score * s)
 {
     background = new Texture();
     gem1 = new Texture();
@@ -11,36 +13,35 @@ Board::Board()
     gem3 = new Texture();
     gem4 = new Texture();
     gem5 = new Texture();
+    score = s;
+    state = Board::CREATION;
 }
 
 Board::~Board()
 {
-    //dtor
+    for (int i = 0; i < LINES; i++) {
+        for (int j = 0; j < COLLUMNS; j++) {
+            delete board[i][j];
+        }
+    }
+    delete null_gem ;
+    delete selected_gem ;
+    delete last_swaped[0];
+    delete last_swaped[1];
+    delete score;
 }
 
 void Board::init() {
-    //Load textures
-    if (!background->loadFromFile("assets/Backdrop13.jpg")) {
-        std::cout << "Failed to load image Backdrop.png" << std::endl;
-    }
-    if (!gem1->loadFromFile("assets/Color-1.png")) {
-        std::cout << "Failed to load image Color-1.png" << std::endl;
-    }
-    if (!gem2->loadFromFile("assets/Color-2.png")) {
-        std::cout << "Failed to load image Color-1.png" << std::endl;
-    }
-    if (!gem3->loadFromFile("assets/Color-3.png")) {
-        std::cout << "Failed to load image Color-1.png" << std::endl;
-    }
-    if (!gem4->loadFromFile("assets/Color-4.png")) {
-        std::cout << "Failed to load image Color-1.png" << std::endl;
-    }
-    if (!gem5->loadFromFile("assets/Color-5.png")) {
-        std::cout << "Failed to load image Color-1.png" << std::endl;
-    }
+    background = Game::texture_loader->load_texture("assets/Backdrop13.jpg");
+    gem1 = Game::texture_loader->load_texture("assets/Color-1.png");
+    gem2 = Game::texture_loader->load_texture("assets/Color-2.png");
+    gem3 = Game::texture_loader->load_texture("assets/Color-3.png");
+    gem4 = Game::texture_loader->load_texture("assets/Color-4.png");
+    gem5 = Game::texture_loader->load_texture("assets/Color-5.png");
 
     //Set board empty
     null_gem = new GemEmpty(this);
+    score->init();
 
     for (int i = 0; i < LINES; i++) {
         for (int j = 0; j < COLLUMNS; j++) {
@@ -51,26 +52,26 @@ void Board::init() {
 
 Gem* Board::generate_gem(int i, int j) {
     Gem* new_gem = new Gem(this);
-    new_gem->set_position(margin_x + i * 70.0f, j * 70.0f - margin_y * 4.0f);
+    new_gem->set_position(MARGIN_X + i * 70.0f, j * 70.0f - MARGIN_Y * 4.0f);
     int r = rand() % 5;
-    new_gem->set_type(r + 1);
+    new_gem->set_type(static_cast<gem_type>(r + 1));
     new_gem->i = i;
     new_gem->j = j;
-    new_gem->set_target(vec2(margin_x + i * 70.0f, j * 70.0f + margin_y));
-    switch (r) {
-    case 0:
+    new_gem->set_target(vec2(MARGIN_X + i * 70.0f, j * 70.0f + MARGIN_Y));
+    switch (r + 1) {
+    case BLACK:
         new_gem->set_texture(gem1);
         break;
-    case 1:
+    case WHITE:
         new_gem->set_texture(gem2);
         break;
-    case 2:
+    case PINK:
         new_gem->set_texture(gem3);
         break;
-    case 3:
+    case BLUE:
         new_gem->set_texture(gem4);
         break;
-    case 4:
+    case ORANGE:
         new_gem->set_texture(gem5);
         break;
     }
@@ -87,8 +88,8 @@ void Board::swap_gem(Gem* g1, Gem* g2) {
     g2->j = g1->j;
     g1->i = i2;
     g1->j = j2;
-    g1->set_target(vec2(margin_x + g1->i * 70.0f, g1->j * 70.0f + margin_y));
-    g2->set_target(vec2(margin_x + g2->i * 70.0f, g2->j * 70.0f + margin_y));
+    g1->set_target(vec2(MARGIN_X + g1->i * 70.0f, g1->j * 70.0f + MARGIN_Y));
+    g2->set_target(vec2(MARGIN_X + g2->i * 70.0f, g2->j * 70.0f + MARGIN_Y));
     last_swaped[0] = g1;
     last_swaped[1] = g2;
     g1->set_swapping();
@@ -130,6 +131,9 @@ void Board::select_gem(Gem* gem)
 
 bool Board::input(SDL_Event* e) {
     bool processed = false;
+    if (state != Board::CHECK_INPUT && (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN)) {
+        return true;
+    }
     for (int i = 0; i < LINES; i++) {
         for (int j = 0; j < COLLUMNS; j++) {
             if (board[i][j]->input(e)) {
@@ -169,22 +173,22 @@ void Board::destroy_matches() {
 void Board::process(float delta_time) {
     bool is_placing = false;
     switch (state) {
-    case CREATION:
+    case Board::CREATION:
         //Create gems if it is empty
         for (int i = 0; i < LINES; i++) {
             for (int j = COLLUMNS - 1; j >= 0; j--) {
-                if (board[i][j]->get_type() == 0) {
+                if (board[i][j]->get_type() == EMPTY) {
                     Gem* empty_gem = board[i][j];
                     for (int n = j - 1; n >= -1; n--) {
-                        if (n < 0 || (board[i][n]->get_type() == 0 && n == 0)) {
+                        if (n < 0 || (board[i][n]->get_type() == EMPTY && n == 0)) {
                             board[i][j] = generate_gem(i, j);
                             break;
                         }
-                        else if (board[i][n]->get_type() != 0) {
+                        else if (board[i][n]->get_type() != EMPTY) {
                             Gem* replace_gem = board[i][n];
                             replace_gem->i = i;
                             replace_gem->j = j;
-                            replace_gem->set_target(vec2(margin_x + i * 70.0f, j * 70.0f + margin_y));
+                            replace_gem->set_target(vec2(MARGIN_X + i * 70.0f, j * 70.0f + MARGIN_Y));
                             board[i][n] = empty_gem;
                             board[i][j] = replace_gem;
                             break;
@@ -195,9 +199,9 @@ void Board::process(float delta_time) {
 
             }
         }
-        state = MOVING;
+        state = Board::MOVING;
         break;
-    case MOVING:
+    case Board::MOVING:
         //Move gems
         is_placing = false;
         for (int i = 0; i < LINES; i++) {
@@ -212,7 +216,7 @@ void Board::process(float delta_time) {
         }
         if (!is_placing) state = DESTROYING;
         break;
-    case ANIMATING:
+    case Board::ANIMATING:
         check = false;
 
         for (int i = 0; i < LINES; i++) {
@@ -225,10 +229,10 @@ void Board::process(float delta_time) {
         }
         if (!check) {
             destroy_matches();
-            state = CREATION;
+            state = Board::CREATION;
         }
         break;
-    case DESTROYING:
+    case Board::DESTROYING:
         //Check Matchs and explode
         matches = check_matchs();
 
@@ -238,27 +242,31 @@ void Board::process(float delta_time) {
                     if (board[i][j] != NULL) {
                         if (board[i][j]->match > 0) {
                             board[i][j]->destroy();
+                            score->add_gem_destroyed(board[i][j]->get_type(), 1);
                         }
                     }
                 }
             }
             last_swaped[0] = NULL;
             last_swaped[1] = NULL;
-            state = ANIMATING;
+            state = Board::ANIMATING;
         }
         else {
             if (last_swaped[0] != NULL && last_swaped[1] != NULL) {
                 swap_gem(last_swaped[0], last_swaped[1]);
+                score->miss_swap();
                 last_swaped[0] = NULL;
                 last_swaped[1] = NULL;
-                state = MOVING;
+                state = Board::MOVING;
             }
             else {
-                state = CHECK_INPUT;
+                if (score->passed()) is_completed = true;
+                state = Board::CHECK_INPUT;
+
             }
         }
         break;
-    case CHECK_INPUT:
+    case Board::CHECK_INPUT:
         //Check input
         for (int i = 0; i < LINES; i++) {
             for (int j = 0; j < COLLUMNS; j++) {
@@ -282,6 +290,8 @@ void Board::render() {
         }
     }
     if (top != NULL) top->render();
+
+    score->render();
 }
 
 bool Board::check_matchs() {

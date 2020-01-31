@@ -1,6 +1,7 @@
 #pragma once
 #include "Texture.h"
 #include "vec.h"
+#include "Constants.h"
 
 class Board;
 
@@ -12,13 +13,14 @@ public:
     virtual bool input(SDL_Event* e);
     virtual void process(float delta_time);
     virtual void render();
+
     void set_texture(Texture* tex);
     void set_position(float x, float y);
     void set_position(vec2 position);
     void set_target(float x, float y);
     void set_target(vec2 target);
-    void set_type(int type);
-    int get_type() const;
+    void set_type(gem_type type);
+    gem_type get_type() const;
     bool is_neighbor(Gem* g);
     bool is_dragging() const;
     void set_swapping();
@@ -34,8 +36,6 @@ public:
 protected:
 
 private:
-    float const margin_x = 232.0;
-    float const margin_y = 104.0;
     float const margin_swap = 20.0;
 
     Board* board;
@@ -52,7 +52,7 @@ private:
 
     bool is_swapping = false;
     float angle;
-    int type = 0;
+    gem_type type = EMPTY;
     float speed = 500.0;
     int animating_counter = 0;
     Texture* texture = NULL;

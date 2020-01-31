@@ -28,7 +28,7 @@ bool Gem::input(SDL_Event* e) {
             }
     }
     else if (e->type == SDL_MOUSEBUTTONUP) {
-        if (is_dragging()) set_target(vec2(margin_x + i * 70.0, margin_y + j * 70.0));
+        if (is_dragging()) set_target(vec2(MARGIN_X + i * 70.0f, MARGIN_Y + j * 70.0f));
         if (touch_me) board->select_gem(this);
         touch_me = false;
         dragging = false;
@@ -38,7 +38,7 @@ bool Gem::input(SDL_Event* e) {
 
 void Gem::process(float delta_time) {
     float vstep = 0.8f * delta_time;
-    if (is_swapping) vstep = 3.0 * delta_time;
+    if (is_swapping) vstep = 3.0f * delta_time;
     time_to_target = time_to_target + 1.0f * vstep;
     if (time_to_target > 1.0f) {
         time_to_target = 1.0f;
@@ -52,22 +52,22 @@ void Gem::process(float delta_time) {
         pos = pos + drag_offset;
     }
     if (is_dragging()) {
-        if (pos.x > margin_x + (i + 1) * 70 - margin_swap) {
+        if (pos.x > MARGIN_X + (i + 1) * 70 - margin_swap) {
             board->swap_gem(this, i + 1, j);
             touch_me = false;
             dragging = false;
         }
-        else if (pos.x < margin_x + (i - 1) * 70 + margin_swap) {
+        else if (pos.x < MARGIN_X + (i - 1) * 70 + margin_swap) {
             board->swap_gem(this, i - 1, j);
             touch_me = false;
             dragging = false;
         }
-        else if (pos.y > margin_y + (j + 1) * 70 - margin_swap) {
+        else if (pos.y > MARGIN_Y + (j + 1) * 70 - margin_swap) {
             board->swap_gem(this, i , j + 1);
             touch_me = false;
             dragging = false;
         }
-        else if (pos.y < margin_y + (j - 1) * 70 + margin_swap) {
+        else if (pos.y < MARGIN_Y + (j - 1) * 70 + margin_swap) {
             board->swap_gem(this, i , j - 1);
             touch_me = false;
             dragging = false;
@@ -150,10 +150,10 @@ void Gem::destroy()
     animating_counter = 0;
 }
 
-void Gem::set_type(int t) {
+void Gem::set_type(gem_type t) {
     type = t;
 }
 
-int Gem::get_type() const {
+gem_type Gem::get_type() const {
     return type;
 }

@@ -4,7 +4,8 @@
 
 Texture::Texture()
 {
-
+    height = 0;
+    width = 0;
 }
 
 Texture::~Texture()
@@ -12,8 +13,7 @@ Texture::~Texture()
 
 }
 
-//Loads image at specified path
-bool Texture::loadFromFile(std::string path)
+bool Texture::load_from_file(std::string path)
 {
     bool success = true;
     SDL_Surface* sur = IMG_Load(path.c_str());
@@ -24,67 +24,78 @@ bool Texture::loadFromFile(std::string path)
         success = false;
     }
     else {
-        tTexture = SDL_CreateTextureFromSurface(Game::renderer, sur);
-        if (tTexture == NULL) {
+        texture = SDL_CreateTextureFromSurface(Game::renderer, sur);
+        if (texture == NULL) {
             std::cout << "Error creating texture." << SDL_GetError() << std::endl;
             success = false;
         }
-        tWidth = sur->w;
-        tHeight = sur->h;
+        width = sur->w;
+        height = sur->h;
         SDL_FreeSurface(sur);
     }
     return success;
 }
 
-//Deallocates texture
-void Texture::free()
+bool Texture::load_from_text(TTF_Font* font, std::string textureText, SDL_Color textColor)
 {
+    free();
 
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, textureText.c_str(), textColor);
+    if (textSurface == NULL)
+    {
+        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+    }
+    else
+    {
+        texture = SDL_CreateTextureFromSurface(Game::renderer, textSurface);
+        if (texture == NULL)
+        {
+            printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+        }
+        else
+        {
+            width = textSurface->w;
+            height = textSurface->h;
+        }
+
+        SDL_FreeSurface(textSurface);
+    }
+
+    return texture != NULL;
 }
 
-//Renders texture at given point
+void Texture::free()
+{
+    if (texture != NULL)
+    {
+        SDL_DestroyTexture(texture);
+        texture = NULL;
+        width = 0;
+        height = 0;
+    }
+
+}
 void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Rect* dest_rect, SDL_Point* center, SDL_RendererFlip flip)
 {
     if (dest_rect == NULL) {
-        SDL_Rect rect = { x, y, tWidth, tHeight };
+        SDL_Rect rect = { x, y, width, height };
         if (clip != NULL)
         {
             rect.w = clip->w;
             rect.h = clip->h;
         }
-        SDL_RenderCopyEx(Game::renderer, tTexture, clip, &rect, angle, center, flip);
+        SDL_RenderCopyEx(Game::renderer, texture, clip, &rect, angle, center, flip);
     }
     else {
-        SDL_RenderCopyEx(Game::renderer, tTexture, clip, dest_rect, angle, center, flip);
+        SDL_RenderCopyEx(Game::renderer, texture, clip, dest_rect, angle, center, flip);
     }
-    
-    //SDL_RenderCopy(Game::renderer, tTexture, NULL, &dest_rect);
 }
 
-
-//Gets image dimensions
-int Texture::getWidth()
+int Texture::get_width()
 {
-    return tWidth;
+    return width;
 }
-int Texture::getHeight()
+int Texture::get_height()
 {
-    return tHeight;
-}
-
-void Texture::setColor(Uint8 red, Uint8 green, Uint8 blue)
-{
-
-}
-
-//Set blending
-void Texture::setBlendMode(SDL_BlendMode blending)
-{
-
-}
-
-//Set alpha modulation
-void Texture::setAlpha(Uint8 alpha)
-{
-
+    return height;
 }
